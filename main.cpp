@@ -80,6 +80,8 @@ int main()
     printOptimizationResult(rosenResult);
 
     std::cout << "\n\n=== Program Complete ===" << std::endl;
-
+    // ADD THESE LINES:
+    std::cout << "\nPress Enter to exit...";
+    std::cin.get();
     return 0;
 }
