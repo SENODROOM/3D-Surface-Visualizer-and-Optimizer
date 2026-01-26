@@ -1,3 +1,3 @@
 C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/optimizer.dir
-C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/ALL_BUILD.dir
-C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/ZERO_CHECK.dir
+C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/edit_cache.dir
+C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/rebuild_cache.dir

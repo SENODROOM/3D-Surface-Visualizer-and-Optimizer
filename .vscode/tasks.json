@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build and Run Optimizer",
+            "type": "shell",
+            "command": "C:\\Program Files\\Git\\bin\\bash.exe",
+            "args": [
+                "${workspaceFolder}/build.sh"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true
+            }
+        }
+    ]
+}

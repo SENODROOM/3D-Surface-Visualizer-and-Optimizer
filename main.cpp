@@ -3,6 +3,7 @@
 #include "Point3D.h"
 #include "Surface.h"
 #include "Optimizer.h"
+#include "Visualizer.h"
 
 void printOptimizationResult(const OptimizationResult &result)
 {
@@ -23,7 +24,7 @@ void printOptimizationResult(const OptimizationResult &result)
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
     std::cout << "=== 3D Surface Visualizer and Optimizer ===" << std::endl;
     std::cout << "=========================================\n"
@@ -42,46 +43,33 @@ int main()
     std::cout << "Gradient at this point: ";
     grad.print();
 
-    // Optimize using Gradient Descent with SMALLER learning rate
+    // Optimize using Gradient Descent
     std::cout << "\n--- Gradient Descent ---" << std::endl;
-    GradientDescent gd(&paraboloid, 0.01, 1000, 1e-6); // Changed from 0.1 to 0.01
+    GradientDescent gd(&paraboloid, 0.01, 1000, 1e-6);
     OptimizationResult gdResult = gd.optimize(5.0, 5.0);
     printOptimizationResult(gdResult);
 
-    // Optimize using Newton's Method
-    std::cout << "\n--- Newton's Method ---" << std::endl;
-    NewtonOptimizer newton(&paraboloid, 0.5, 100, 1e-6); // Changed from 1.0 to 0.5
-    OptimizationResult newtonResult = newton.optimize(5.0, 5.0);
-    printOptimizationResult(newtonResult);
+    std::cout << "\n\n========================================" << std::endl;
+    std::cout << "Opening 3D Visualization Window..." << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "\nControls:" << std::endl;
+    std::cout << "  W/S - Rotate up/down" << std::endl;
+    std::cout << "  A/D - Rotate left/right" << std::endl;
+    std::cout << "  +/- - Zoom in/out" << std::endl;
+    std::cout << "  R   - Reset view" << std::endl;
+    std::cout << "  ESC - Exit" << std::endl;
+    std::cout << "\nGreen sphere = Start point" << std::endl;
+    std::cout << "Red sphere   = Minimum found" << std::endl;
+    std::cout << "Red line     = Optimization path\n"
+              << std::endl;
 
-    // Test saddle surface: z = x^2 - y^2
-    std::cout << "\n\n=== Testing Saddle Surface: z = x^2 - y^2 ===" << std::endl;
-    SaddleSurface saddle;
-    GradientDescent gdSaddle(&saddle, 0.01, 1000, 1e-6); // Changed from 0.05 to 0.01
-    OptimizationResult saddleResult = gdSaddle.optimize(5.0, 5.0);
-    printOptimizationResult(saddleResult);
+    // Create visualizer for paraboloid
+    Visualizer viz(&paraboloid, -10, 10, -10, 10, 50);
+    viz.setOptimizationResult(&gdResult);
 
-    // Custom surface example: z = sin(x) * cos(y)
-    std::cout << "\n\n=== Testing Custom Surface: z = sin(x)*cos(y) ===" << std::endl;
-    CustomSurface custom([](double x, double y)
-                         { return std::sin(x) * std::cos(y); });
+    // Initialize and run visualization
+    viz.initialize(argc, argv);
+    viz.run();
 
-    GradientDescent gdCustom(&custom, 0.05, 2000, 1e-6); // Increased iterations
-    OptimizationResult customResult = gdCustom.optimize(1.0, 1.0);
-    printOptimizationResult(customResult);
-
-    // Additional interesting surface: Rosenbrock function
-    std::cout << "\n\n=== Testing Rosenbrock Function: z = (1-x)^2 + 100(y-x^2)^2 ===" << std::endl;
-    CustomSurface rosenbrock([](double x, double y)
-                             { return (1.0 - x) * (1.0 - x) + 100.0 * (y - x * x) * (y - x * x); });
-
-    GradientDescent gdRosen(&rosenbrock, 0.0001, 5000, 1e-6);
-    OptimizationResult rosenResult = gdRosen.optimize(0.0, 0.0);
-    printOptimizationResult(rosenResult);
-
-    std::cout << "\n\n=== Program Complete ===" << std::endl;
-    // ADD THESE LINES:
-    std::cout << "\nPress Enter to exit...";
-    std::cin.get();
     return 0;
 }
