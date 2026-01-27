@@ -1011,3 +1011,1510 @@ Before diving deep, try these:
 
 **Last Updated:** January 2026
 **Version:** 1.0
+
+
+# 3D Surface Optimizer - Complete Technical Documentation
+
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Mathematical Foundations](#mathematical-foundations)
+3. [Architecture & Design](#architecture--design)
+4. [Core Components Deep Dive](#core-components-deep-dive)
+5. [Optimization Algorithms](#optimization-algorithms)
+6. [Equation Parser Implementation](#equation-parser-implementation)
+7. [3D Visualization System](#3d-visualization-system)
+8. [Build System & Dependencies](#build-system--dependencies)
+9. [Usage Guide](#usage-guide)
+10. [Advanced Topics](#advanced-topics)
+
+---
+
+## Project Overview
+
+### What This Project Does
+
+This is a **3D Surface Visualization and Optimization System** that allows users to:
+
+1. **Define mathematical surfaces** using equations with variables x, y, z
+2. **Visualize surfaces in 3D** with interactive rotation and zoom
+3. **Find local minima** using optimization algorithms (Gradient Descent or Newton's Method)
+4. **Visualize the optimization path** in real-time on the 3D surface
+
+### Key Features
+
+- **Interactive Equation Input**: Enter any mathematical expression
+- **Real-time 3D Rendering**: OpenGL-based visualization with lighting and shading
+- **Multiple Optimization Methods**: Gradient Descent and Newton's Method
+- **Path Visualization**: See how the optimizer navigates the surface
+- **Configurable Parameters**: Adjust learning rate, start position, mesh resolution
+
+### Technology Stack
+
+- **Language**: C++17
+- **Graphics**: OpenGL with FreeGLUT
+- **Build System**: CMake
+- **Mathematical Operations**: Standard C++ math library
+- **Parser**: Custom recursive descent parser
+
+---
+
+## Mathematical Foundations
+
+### 1. Surface Representation
+
+A 3D surface is mathematically represented as a function:
+
+```
+z = f(x, y)
+```
+
+Where:
+- `(x, y)` are coordinates in the horizontal plane
+- `z` is the height/value at that point
+- `f` is any continuous function
+
+**Examples:**
+- Paraboloid: `z = x² + y²` (bowl-shaped)
+- Saddle: `z = x² - y²` (horse saddle shape)
+- Custom: `z = sin(x) * cos(y) + x²`
+
+### 2. Gradients and Partial Derivatives
+
+#### What is a Gradient?
+
+The **gradient** (∇f) is a vector that points in the direction of steepest ascent on the surface:
+
+```
+∇f(x, y) = (∂f/∂x, ∂f/∂y)
+```
+
+**Components:**
+- `∂f/∂x`: Partial derivative with respect to x (how z changes as x changes, y fixed)
+- `∂f/∂y`: Partial derivative with respect to y (how z changes as y changes, x fixed)
+
+#### Numerical Approximation
+
+Since we work with arbitrary functions, we use **finite differences** to approximate derivatives:
+
+```cpp
+∂f/∂x ≈ [f(x + h, y) - f(x - h, y)] / (2h)
+```
+
+Where `h = 0.0001` is a small step size. This is called the **central difference** method.
+
+**Why Central Difference?**
+- More accurate than forward difference: `[f(x+h) - f(x)] / h`
+- Reduces truncation error to O(h²) instead of O(h)
+
+### 3. Optimization Theory
+
+#### Local Minima
+
+A point `(x*, y*)` is a **local minimum** if:
+```
+f(x*, y*) ≤ f(x, y)
+```
+for all points in a neighborhood around `(x*, y*)`.
+
+#### Necessary Condition
+
+At a minimum, the gradient must be zero (or very small):
+```
+∇f(x*, y*) = (0, 0)
+```
+
+This means the surface is "flat" at that point - no slope in any direction.
+
+#### Hessian Matrix
+
+The **Hessian** is a matrix of second derivatives that describes the curvature:
+
+```
+H = [ ∂²f/∂x²    ∂²f/∂x∂y ]
+    [ ∂²f/∂x∂y   ∂²f/∂y²  ]
+```
+
+**Properties:**
+- If H is positive definite at a critical point → local minimum
+- If H is negative definite → local maximum
+- If H has mixed signs → saddle point
+
+---
+
+## Architecture & Design
+
+### Object-Oriented Design
+
+The project follows **SOLID principles** with clear separation of concerns:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                  GUIManager                         │
+│  (Orchestrates the entire application)              │
+└──────────────┬──────────────────────────────────────┘
+               │
+       ┌───────┴───────┐
+       │               │
+┌──────▼──────┐  ┌────▼─────────┐
+│EquationParser│  │ Visualizer  │
+│(Parses math) │  │(3D Graphics)│
+└──────┬───────┘  └────┬─────────┘
+       │               │
+       │         ┌─────▼──────┐
+       │         │  Surface   │
+       │         │(Base Class)│
+       │         └─────┬──────┘
+       │               │
+       │         ┌─────┴──────────────┐
+       │         │                    │
+       │    ┌────▼────────┐    ┌─────▼──────┐
+       │    │ Paraboloid  │    │CustomSurface│
+       │    │             │    │(User Eqn)   │
+       │    └─────────────┘    └──────┬──────┘
+       │                              │
+       └──────────────────────────────┘
+                   │
+            ┌──────▼──────┐
+            │  Optimizer  │
+            │ (Abstract)  │
+            └──────┬──────┘
+                   │
+         ┌─────────┴──────────┐
+         │                    │
+    ┌────▼─────────┐   ┌─────▼────────┐
+    │GradientDescent│   │NewtonOptimizer│
+    └───────────────┘   └──────────────┘
+```
+
+### Design Patterns Used
+
+#### 1. Strategy Pattern (Optimizer)
+
+```cpp
+class Optimizer {
+    virtual OptimizationResult optimize(double x, double y) = 0;
+};
+
+class GradientDescent : public Optimizer { ... };
+class NewtonOptimizer : public Optimizer { ... };
+```
+
+**Why?** Allows swapping optimization algorithms without changing client code.
+
+#### 2. Template Method Pattern (Surface)
+
+```cpp
+class Surface {
+    virtual double evaluate(double x, double y) const = 0;
+    // Common implementations use evaluate()
+    Point3D gradient(double x, double y) const { ... }
+};
+```
+
+**Why?** Base class provides common functionality, derived classes specialize behavior.
+
+#### 3. Singleton Pattern (Visualizer)
+
+```cpp
+static Visualizer* instance;
+static void displayCallback() {
+    if (instance) instance->display();
+}
+```
+
+**Why?** GLUT requires static callback functions, singleton provides access to instance.
+
+#### 4. Facade Pattern (GUIManager)
+
+```cpp
+class GUIManager {
+    // Hides complexity of Parser, Visualizer, Optimizer
+    void initialize();
+    void run();
+};
+```
+
+**Why?** Simplifies the interface for the complex subsystem.
+
+---
+
+## Core Components Deep Dive
+
+### 1. Point3D Class (`Point3D.h`, `Point3D.cpp`)
+
+**Purpose**: Represents a 3D point or vector.
+
+#### Key Concepts
+
+```cpp
+class Point3D {
+private:
+    double x, y, z;
+public:
+    Point3D operator+(const Point3D& other) const;  // Vector addition
+    Point3D operator*(double scalar) const;          // Scalar multiplication
+    double magnitude() const;                        // ||v|| = √(x²+y²+z²)
+    Point3D normalize() const;                       // v/||v||
+};
+```
+
+#### Mathematical Operations
+
+**Vector Addition**: Combines two position vectors
+```
+v1 + v2 = (x1 + x2, y1 + y2, z1 + z2)
+```
+
+**Magnitude**: Distance from origin
+```
+||v|| = √(x² + y² + z²)
+```
+
+**Normalization**: Creates unit vector (length = 1)
+```
+v̂ = v / ||v||
+```
+
+### 2. Surface Class Hierarchy (`Surface.h`, `Surface.cpp`)
+
+#### Abstract Base Class
+
+```cpp
+class Surface {
+public:
+    virtual double evaluate(double x, double y) const = 0;  // Pure virtual
+    virtual double partialX(double x, double y) const;      // Numerical derivative
+    virtual double partialY(double x, double y) const;
+    Point3D gradient(double x, double y) const;
+};
+```
+
+**Design Decision**: Why virtual functions?
+- Allows polymorphism: `Surface* s = new Paraboloid();`
+- Different surfaces can have different implementations
+- Enables analytical derivatives for known functions
+
+#### Paraboloid Implementation
+
+```cpp
+class Paraboloid : public Surface {
+public:
+    double evaluate(double x, double y) const override {
+        return x * x + y * y;  // z = x² + y²
+    }
+    
+    double partialX(double x, double y) const override {
+        return 2 * x;  // Analytical: d/dx(x² + y²) = 2x
+    }
+};
+```
+
+**Optimization**: Uses analytical derivatives instead of numerical approximation for better performance and accuracy.
+
+#### CustomSurface Implementation
+
+```cpp
+class CustomSurface : public Surface {
+private:
+    std::function<double(double, double)> func;
+public:
+    CustomSurface(std::function<double(double, double)> f) : func(f) {}
+    
+    double evaluate(double x, double y) const override {
+        return func(x, y);  // Calls user-provided function
+    }
+};
+```
+
+**C++ Feature**: Uses `std::function` - a type-erased wrapper for any callable:
+- Lambda functions: `[](double x, double y) { return x*x; }`
+- Function pointers
+- Functors (objects with `operator()`)
+
+#### Mesh Generation
+
+```cpp
+std::vector<Point3D> generateMesh(double xMin, double xMax, 
+                                  double yMin, double yMax, 
+                                  int resolution) const {
+    // Creates (resolution+1)² points
+    for (int i = 0; i <= resolution; ++i) {
+        for (int j = 0; j <= resolution; ++j) {
+            double x = xMin + i * xStep;
+            double y = yMin + j * yStep;
+            double z = evaluate(x, y);
+            mesh.push_back(Point3D(x, y, z));
+        }
+    }
+}
+```
+
+**Algorithm**: Regular grid sampling
+- Divides domain into equal steps
+- Evaluates function at each grid point
+- Used for rendering the surface
+
+---
+
+## Optimization Algorithms
+
+### 1. Gradient Descent (`GradientDescent` class)
+
+#### The Algorithm
+
+**Intuition**: Walk downhill in the direction of steepest descent.
+
+**Update Rule**:
+```
+x(t+1) = x(t) - α * ∂f/∂x
+y(t+1) = y(t) - α * ∂f/∂y
+```
+
+Where:
+- `α` is the learning rate (step size)
+- `∂f/∂x, ∂f/∂y` are components of the gradient
+
+#### Implementation
+
+```cpp
+OptimizationResult GradientDescent::optimize(double startX, double startY) {
+    double x = startX, y = startY;
+    
+    for (int iter = 0; iter < maxIterations; ++iter) {
+        // Store current position for visualization
+        result.path.push_back(Point3D(x, y, surface->evaluate(x, y)));
+        
+        // Calculate gradient
+        Point3D grad = surface->gradient(x, y);
+        
+        // Check convergence: ||∇f|| < tolerance
+        double gradMag = sqrt(grad.getX()² + grad.getY()²);
+        if (gradMag < tolerance) {
+            result.converged = true;
+            break;
+        }
+        
+        // Update position
+        x = x - learningRate * grad.getX();
+        y = y - learningRate * grad.getY();
+    }
+    
+    return result;
+}
+```
+
+#### Hyperparameters
+
+**Learning Rate (α)**:
+- Too small → slow convergence
+- Too large → overshooting, oscillation, divergence
+- Typical: 0.01 - 0.1
+
+**Tolerance**:
+- Stopping criterion: ||∇f|| < tolerance
+- Prevents infinite iterations near minimum
+- Typical: 1e-6
+
+#### Convergence Analysis
+
+**When does it converge?**
+- Function is convex (bowl-shaped)
+- Learning rate is appropriately chosen: `0 < α < 2/L` where L is Lipschitz constant
+
+**Convergence Rate**: O(1/k) for convex functions (k iterations)
+
+### 2. Newton's Method (`NewtonOptimizer` class)
+
+#### The Algorithm
+
+**Intuition**: Uses curvature information (second derivatives) for faster convergence.
+
+**Update Rule**:
+```
+[x(t+1)]   [x(t)]         [∂f/∂x]
+[y(t+1)] = [y(t)] - α H⁻¹ [∂f/∂y]
+```
+
+Where H is the Hessian matrix.
+
+#### Hessian Matrix Computation
+
+```cpp
+double NewtonOptimizer::partialXX(double x, double y) const {
+    const double h = 0.0001;
+    // Second derivative: d²f/dx² ≈ [f'(x+h) - f'(x-h)] / (2h)
+    return (surface->partialX(x + h, y) - 
+            surface->partialX(x - h, y)) / (2 * h);
+}
+
+double NewtonOptimizer::partialXY(double x, double y) const {
+    // Mixed partial: ∂²f/∂x∂y ≈ [fx(x,y+h) - fx(x,y-h)] / (2h)
+    return (surface->partialX(x, y + h) - 
+            surface->partialX(x, y - h)) / (2 * h);
+}
+```
+
+**Numerical Stability**: Using central differences for second derivatives introduces more error but is still stable for well-behaved functions.
+
+#### Hessian Inversion
+
+For a 2×2 matrix:
+```
+H = [a  b]    H⁻¹ = 1/(ad-b²) [ d  -b]
+    [b  d]                    [-b   a]
+```
+
+```cpp
+double det = fxx * fyy - fxy * fxy;
+if (abs(det) < 1e-10) {
+    // Singular matrix - can't invert
+    // Happens at saddle points or flat regions
+}
+
+double invH11 = fyy / det;
+double invH12 = -fxy / det;
+double invH22 = fxx / det;
+```
+
+#### Update Step
+
+```cpp
+// Newton direction: d = -H⁻¹∇f
+double dx = invH11 * gx + invH12 * gy;
+double dy = invH12 * gx + invH22 * gy;
+
+// Update with learning rate (damped Newton's method)
+x = x - learningRate * dx;
+y = y - learningRate * dy;
+```
+
+**Damping**: Using `learningRate < 1` makes it more stable but slower.
+
+#### Comparison: Gradient Descent vs Newton's Method
+
+| Aspect | Gradient Descent | Newton's Method |
+|--------|------------------|-----------------|
+| **Convergence Rate** | Linear O(1/k) | Quadratic O(1/k²) |
+| **Computation per Iteration** | O(n) - just gradient | O(n²) - Hessian + inversion |
+| **Memory** | Low | Higher (store Hessian) |
+| **Best For** | Large problems, rough terrain | Small problems, smooth surfaces |
+| **Robustness** | More robust | Can fail at saddle points |
+
+---
+
+## Equation Parser Implementation
+
+### Why We Need a Parser
+
+Users enter equations as strings: `"x^2 + sin(y) * 3"`. We need to:
+1. **Tokenize**: Break into meaningful pieces
+2. **Parse**: Build a syntax tree
+3. **Evaluate**: Compute numerical result
+
+### Tokenization Process
+
+```cpp
+enum TokenType { NUMBER, VARIABLE, OPERATOR, FUNCTION, LPAREN, RPAREN };
+
+void tokenize() {
+    // "x^2 + sin(y)" becomes:
+    // [VARIABLE:x] [OPERATOR:^] [NUMBER:2] [OPERATOR:+] 
+    // [FUNCTION:sin] [LPAREN] [VARIABLE:y] [RPAREN]
+}
+```
+
+**State Machine**: Reads character by character, identifying patterns:
+- Digits → NUMBER
+- Letters → VARIABLE or FUNCTION
+- `+, -, *, /, ^` → OPERATOR
+- `(, )` → LPAREN, RPAREN
+
+### Recursive Descent Parsing
+
+**Grammar** (in BNF notation):
+```
+expression → term (('+' | '-') term)*
+term       → power (('*' | '/') power)*
+power      → unary ('^' power)?
+unary      → ('+' | '-')? primary
+primary    → NUMBER | VARIABLE | FUNCTION '(' expression ')' | '(' expression ')'
+```
+
+**Operator Precedence** (highest to lowest):
+1. Parentheses `()`
+2. Functions `sin()`, `cos()`
+3. Unary `+`, `-`
+4. Exponentiation `^` (right associative)
+5. Multiplication, Division `*`, `/`
+6. Addition, Subtraction `+`, `-`
+
+### Parsing Implementation
+
+```cpp
+double parseExpression() {
+    // expression → term (('+' | '-') term)*
+    double result = parseTerm();
+    
+    while (current token is '+' or '-') {
+        string op = current token;
+        advance();
+        double right = parseTerm();
+        
+        if (op == "+") result += right;
+        else result -= right;
+    }
+    
+    return result;
+}
+
+double parseTerm() {
+    // term → power (('*' | '/') power)*
+    double result = parsePower();
+    
+    while (current token is '*' or '/') {
+        string op = current token;
+        advance();
+        double right = parsePower();
+        
+        if (op == "*") result *= right;
+        else result /= right;
+    }
+    
+    return result;
+}
+
+double parsePower() {
+    // power → unary ('^' power)?    [RIGHT ASSOCIATIVE]
+    double result = parseUnary();
+    
+    if (current token is '^') {
+        advance();
+        double exponent = parsePower();  // Recursive for right-associativity
+        result = pow(result, exponent);
+    }
+    
+    return result;
+}
+```
+
+**Right Associativity**: `2^3^2` = `2^(3^2)` = `2^9` = 512, not `(2^3)^2` = 64
+
+### Function Calls
+
+```cpp
+double parsePrimary() {
+    if (token is FUNCTION) {
+        string funcName = token.value;
+        advance();
+        expect('(');
+        
+        if (funcName is binary function like "pow") {
+            double arg1 = parseExpression();
+            expect(',');
+            double arg2 = parseExpression();
+            expect(')');
+            return binaryFunctions[funcName](arg1, arg2);
+        } else {
+            double arg = parseExpression();
+            expect(')');
+            return functions[funcName](arg);
+        }
+    }
+}
+```
+
+### Supported Functions
+
+**Unary Functions** (one argument):
+- `sin(x)`, `cos(x)`, `tan(x)` - Trigonometric
+- `exp(x)` - e^x
+- `log(x)`, `ln(x)` - Natural logarithm
+- `log10(x)` - Base-10 logarithm
+- `sqrt(x)` - Square root
+- `abs(x)` - Absolute value
+- `floor(x)`, `ceil(x)` - Rounding
+
+**Binary Functions** (two arguments):
+- `pow(x, y)` - x^y
+- `min(x, y)` - Minimum
+- `max(x, y)` - Maximum
+
+### Implicit Multiplication Handling
+
+```cpp
+string normalizeEquation(const string& eq) {
+    // Convert: "2x" → "2*x"
+    // Convert: "2(x+y)" → "2*(x+y)"
+    // Convert: "(x)(y)" → "(x)*(y)"
+    
+    if (isdigit(current) && isalpha(next))
+        insert '*' between them;
+    if (isdigit(current) && next == '(')
+        insert '*' between them;
+    if (current == ')' && next == '(')
+        insert '*' between them;
+}
+```
+
+**Edge Case**: `sin(x)` should NOT become `sin*(x)` - check if it's a known function.
+
+### Error Handling
+
+```cpp
+bool validate(string& errorMessage) {
+    try {
+        tokenize();
+        checkBalancedParentheses();
+        evaluateWithDummyVariables();
+        return true;
+    } catch (exception& e) {
+        errorMessage = e.what();
+        return false;
+    }
+}
+```
+
+**Common Errors**:
+- Unbalanced parentheses
+- Division by zero
+- Unknown variables
+- Malformed expressions
+
+---
+
+## 3D Visualization System
+
+### OpenGL Pipeline Overview
+
+```
+Vertices → Vertex Processing → Primitive Assembly → Rasterization → Fragment Processing → Display
+```
+
+### FreeGLUT Setup
+
+```cpp
+void Visualizer::initialize(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("3D Surface Optimizer");
+    
+    glEnable(GL_DEPTH_TEST);      // Z-buffer for hidden surface removal
+    glEnable(GL_LIGHTING);         // Phong lighting model
+    glEnable(GL_LIGHT0);           // Primary light source
+    glEnable(GL_COLOR_MATERIAL);   // Allow material colors
+}
+```
+
+**Double Buffering**: Prevents flickering by drawing to back buffer, then swapping.
+
+**Depth Test**: Ensures closer objects appear in front of farther ones.
+
+### Camera Positioning
+
+```cpp
+void display() {
+    glLoadIdentity();
+    
+    // Camera at (0, 0, zoom) looking at (0, 0, 0), up is (0, 1, 0)
+    gluLookAt(0, 0, zoom,    // Eye position
+              0, 0, 0,        // Look-at point
+              0, 1, 0);       // Up vector
+    
+    // Apply rotations
+    glRotatef(rotationX, 1, 0, 0);  // Rotate around X-axis
+    glRotatef(rotationY, 0, 1, 0);  // Rotate around Y-axis
+}
+```
+
+**View Matrix**: Transforms world coordinates to camera coordinates.
+
+### Surface Rendering
+
+#### Triangle Strip Method
+
+```cpp
+void drawSurface() {
+    for (int i = 0; i < resolution; ++i) {
+        glBegin(GL_TRIANGLE_STRIP);
+        
+        for (int j = 0; j <= resolution; ++j) {
+            double x1 = xMin + i * xStep;
+            double x2 = xMin + (i + 1) * xStep;
+            double y = yMin + j * yStep;
+            
+            double z1 = surface->evaluate(x1, y);
+            double z2 = surface->evaluate(x2, y);
+            
+            // Calculate normals for lighting
+            Point3D grad1 = surface->gradient(x1, y);
+            Point3D normal1(-grad1.getX(), -grad1.getY(), 1.0);
+            normal1 = normal1.normalize();
+            
+            glNormal3f(normal1.getX(), normal1.getY(), normal1.getZ());
+            glVertex3f(x1, y, z1);
+            
+            glNormal3f(normal2.getX(), normal2.getY(), normal2.getZ());
+            glVertex3f(x2, y, z2);
+        }
+        
+        glEnd();
+    }
+}
+```
+
+**Why Triangle Strips?**
+- Efficient: Shares vertices between adjacent triangles
+- For N vertices: (N-2) triangles instead of N/3
+
+**Normal Calculation**:
+```
+If surface is z = f(x, y), the normal is proportional to:
+n = (-∂f/∂x, -∂f/∂y, 1)
+```
+
+This is because the surface can be written as: `F(x,y,z) = z - f(x,y) = 0`
+And the gradient of F is the normal: `∇F = (-fx, -fy, 1)`
+
+### Lighting Model
+
+```cpp
+GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};  // Directional light
+GLfloat light_ambient[] = {0.3, 0.3, 0.3, 1.0};   // Ambient component
+GLfloat light_diffuse[] = {0.7, 0.7, 0.7, 1.0};   // Diffuse component
+
+glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+```
+
+**Phong Reflection Model**:
+```
+I = Ia*ka + Id*kd*(N·L) + Is*ks*(R·V)^n
+```
+
+Where:
+- `Ia, Id, Is` = ambient, diffuse, specular light intensities
+- `ka, kd, ks` = material reflection coefficients
+- `N` = surface normal
+- `L` = light direction
+- `R` = reflection direction
+- `V` = view direction
+- `n` = shininess exponent
+
+### Path Visualization
+
+```cpp
+void drawOptimizationPath() {
+    // Draw path as red line
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glLineWidth(3.0f);
+    
+    glBegin(GL_LINE_STRIP);
+    for (const auto& point : optResult->path) {
+        glVertex3f(point.getX(), point.getY(), point.getZ());
+    }
+    glEnd();
+    
+    // Start point: green sphere
+    Point3D start = optResult->path.front();
+    glPushMatrix();
+    glTranslatef(start.getX(), start.getY(), start.getZ());
+    glutSolidSphere(0.2, 20, 20);  // radius, slices, stacks
+    glPopMatrix();
+    
+    // End point: red sphere
+    Point3D end = optResult->path.back();
+    glPushMatrix();
+    glTranslatef(end.getX(), end.getY(), end.getZ());
+    glutSolidSphere(0.3, 20, 20);
+    glPopMatrix();
+}
+```
+
+**Matrix Stack**: `glPushMatrix()` saves current transformation, `glPopMatrix()` restores it.
+
+### Interactive Controls
+
+```cpp
+void keyboardCallback(unsigned char key, int x, int y) {
+    switch (key) {
+        case 'w': instance->rotationX += 5.0f; break;  // Rotate up
+        case 's': instance->rotationX -= 5.0f; break;  // Rotate down
+        case 'a': instance->rotationY -= 5.0f; break;  // Rotate left
+        case 'd': instance->rotationY += 5.0f; break;  // Rotate right
+        case '+': instance->zoom -= 2.0f; break;        // Zoom in
+        case '-': instance->zoom += 2.0f; break;        // Zoom out
+        case 'r':                                       // Reset view
+            instance->rotationX = 30.0f;
+            instance->rotationY = 45.0f;
+            instance->zoom = 30.0f;
+            break;
+        case 27: exit(0); break;  // ESC
+    }
+    glutPostRedisplay();  // Request redraw
+}
+```
+
+---
+
+## Build System & Dependencies
+
+### CMake Configuration
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(SurfaceOptimizer VERSION 1.0)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+```
+
+**Why C++17?**
+- `std::function` for callable wrappers
+- Structured bindings (if used)
+- Better type inference
+
+### Platform-Specific Configuration
+
+#### Windows
+
+```cmake
+if(WIN32)
+    set(FREEGLUT_DIR "C:/freeglut" CACHE PATH "FreeGLUT installation")
+    include_directories(${FREEGLUT_DIR}/include)
+    link_directories(${FREEGLUT_DIR}/lib/x64)
+    
+    target_link_libraries(optimizer freeglut opengl32 glu32)
+    
+    # Copy DLL to build directory
+    add_custom_command(TARGET optimizer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${FREEGLUT_DIR}/bin/x64/freeglut.dll"
+        $<TARGET_FILE_DIR:optimizer>
+    )
+endif()
+```
+
+#### Linux/Mac
+
+```cmake
+else()
+    find_package(GLUT REQUIRED)
+    find_package(OpenGL REQUIRED)
+    include_directories(${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
+    
+    target_link_libraries(optimizer 
+        ${GLUT_LIBRARIES} 
+        ${OPENGL_LIBRARIES} 
+        m)  # Math library
+endif()
+```
+
+### Executables
+
+**Two targets**:
+1. `optimizer`: Main program with equation GUI
+2. `optimizer_demo`: Original hardcoded demo
+
+```cmake
+add_executable(optimizer 
+    ${COMMON_SOURCES}
+    ${EQUATION_SOURCES}
+    main_equation_gui.cpp
+)
+
+add_executable(optimizer_demo 
+    ${COMMON_SOURCES}
+    main.cpp
+)
+```
+
+### Dependencies
+
+**Required**:
+- CMake 3.10+
+- C++17 compiler (GCC 7+, Clang 5+, MSVC 2017+)
+- FreeGLUT (OpenGL Utility Toolkit)
+- OpenGL libraries
+
+**Installation**:
+
+Ubuntu/Debian:
+```bash
+sudo apt-get install cmake build-essential freeglut3-dev
+```
+
+Windows:
+1. Install CMake from cmake.org
+2. Install MinGW-w64 or Visual Studio
+3. Download FreeGLUT from freeglut.sourceforge.net
+4. Extract to C:\freeglut
+
+---
+
+## Usage Guide
+
+### Building the Project
+
+#### Linux/Mac
+
+```bash
+chmod +x build.sh
+./build.sh
+```
+
+#### Windows
+
+```bat
+run.bat
+```
+
+Or manually:
+```bat
+mkdir build
+cd build
+cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+mingw32-make
+```
+
+### Running the Program
+
+```bash
+cd build
+./optimizer          # Linux
+optimizer.exe        # Windows
+```
+
+### Using the Equation GUI
+
+#### Step 1: Enter Equation
+
+Example inputs:
+- `x^2 + y^2` - Paraboloid
+- `sin(x) * cos(y)` - Wave pattern
+- `x^2 - y^2` - Saddle surface
+- `exp(-(x^2 + y^2))` - Gaussian
+- `pow(x, 2) + 2*x*y + pow(y, 2)` - Using pow function
+
+**Tips**:
+- Use `^` or `**` for exponentiation
+- Implicit multiplication: `2x` becomes `2*x`
+- Case sensitive: `X` and `x` are different
+
+#### Step 2: Configuration
+
+**Optimize** [y/n]: Run optimization?
+- `y`: Find minimum and show path
+- `n`: Just visualize surface
+
+**Start X, Start Y**: Initial point for optimization
+- Choose a point in your domain
+- Different starts may find different local minima
+
+**Learning Rate** (α): Step size for optimization
+- Small (0.001-0.01): Slow but stable
+- Medium (0.01-0.1): Balanced
+- Large (>0.1): Fast but may diverge
+
+**Domain** (xMin, xMax, yMin, yMax): Viewing region
+- Should contain interesting features
+- Affects mesh resolution
+
+**Resolution**: Number of grid points
+- Higher = smoother surface but slower rendering
+- 50-100 is typical
+
+#### Step 3: 3D Visualization
+
+**Mouse/Keyboard Controls**:
+- `W/S`: Pitch rotation (up/down)
+- `A/D`: Yaw rotation (left/right)
+- `+/-`: Zoom in/out
+- `R`: Reset camera
+- `ESC`: Exit
+
+### Example Sessions
+
+#### Example 1: Finding Minimum of Paraboloid
+
+```
+Equation: x^2 + y^2
+Optimize: y
+Start X: 5
+Start Y: 5
+Learning Rate: 0.05
+X Range: -10 to 10
+Y Range: -10 to 10
+Resolution: 50
+```
+
+**Expected Result**: Converges to (0, 0, 0) from (5, 5, 50)
+
+#### Example 2: Saddle Point
+
+```
+Equation: x^2 - y^2
+Optimize: y
+Start X: 1
+Start Y: 1
+Learning Rate: 0.01
+```
+
+**Expected Result**: May not converge - saddle point at (0, 0)
+
+#### Example 3: Complex Surface
+
+```
+Equation: sin(x) + cos(y) + 0.1*x^2 + 0.1*y^2
+Optimize: y
+Start X: 3
+Start Y: 3
+Learning Rate: 0.05
+```
+
+**Expected Result**: Finds one of multiple local minima
+
+---
+
+## Advanced Topics
+
+### 1. Numerical Stability
+
+#### Finite Difference Errors
+
+**Truncation Error**: Using finite h introduces approximation error
+```
+Error ≈ h² * |f'''(x)| / 6
+```
+
+**Roundoff Error**: Computer arithmetic is not exact
+```
+Roundoff ≈ ε / h
+```
+
+**Optimal h**: Balance truncation and roundoff
+```
+h_optimal ≈ (3ε)^(1/3) ≈ 10^(-5) to 10^(-4)
+```
+
+We use `h = 0.0001` as a compromise.
+
+#### Hessian Singularity
+
+At saddle points: `det(H) ≈ 0`
+
+**Solution**: Check determinant before inversion
+```cpp
+if (abs(det) < 1e-10) {
+    // Fall back to gradient descent or terminate
+}
+```
+
+### 2. Optimization Challenges
+
+#### Local vs Global Minima
+
+**Problem**: Gradient-based methods find local minima, not necessarily global
+
+**Solutions**:
+- Multiple random starts
+- Simulated annealing
+- Genetic algorithms
+
+#### Plateau Regions
+
+**Problem**: ||∇f|| ≈ 0 but not at minimum
+
+**Detection**:
+```cpp
+if (gradMag < tolerance && iterations < maxIterations/2) {
+    // Might be on plateau, not at minimum
+}
+```
+
+#### Oscillation in Narrow Valleys
+
+**Problem**: Learning rate too large for valley width
+
+**Solution**: Adaptive learning rate (momentum, Adam optimizer)
+
+### 3. Performance Optimization
+
+#### Mesh Generation
+
+**Current**: O(n²) evaluations for n×n grid
+
+**Optimization**: Adaptive mesh refinement
+- Use coarse mesh far from interesting regions
+- Refine near steep gradients or minima
+
+#### Rendering
+
+**Current**: Redraw entire mesh every frame
+
+**Optimizations**:
+- Display lists (pre-compiled geometry)
+- Vertex Buffer Objects (VBO) for GPU storage
+- Level of Detail (LOD) based on camera distance
+
+### 4. Mathematical Extensions
+
+#### Constrained Optimization
+
+**Problem**: Minimize f(x, y) subject to g(x, y) = 0
+
+**Method**: Lagrange multipliers
+```
+L(x, y, λ) = f(x, y) + λ·g(x, y)
+∇L = 0
+```
+
+#### Multi-variable Optimization
+
+**Extension**: Optimize functions of n variables
+
+**Changes Needed**:
+- n-dimensional gradient
+- n×n Hessian matrix
+- Matrix inversion using LU decomposition
+
+#### Quasi-Newton Methods
+
+**BFGS Algorithm**: Approximates Hessian instead of computing it
+- Faster than full Newton
+- More robust than gradient descent
+
+### 5. GPU Acceleration
+
+#### Parallel Surface Evaluation
+
+```cpp
+// Pseudocode for CUDA/OpenCL
+kernel evaluateSurface(float* x, float* y, float* z, int n) {
+    int i = get_global_id(0);
+    if (i < n) {
+        z[i] = f(x[i], y[i]);  // Each thread evaluates one point
+    }
+}
+```
+
+**Speedup**: 10-100x for large meshes
+
+#### GPU-Based Rendering
+
+Modern approach: Vertex shaders compute surface on GPU
+```glsl
+// GLSL vertex shader
+void main() {
+    float z = x*x + y*y;  // Evaluate surface
+    gl_Position = projectionMatrix * viewMatrix * vec4(x, y, z, 1.0);
+}
+```
+
+### 6. Extending the Parser
+
+#### Adding Custom Functions
+
+```cpp
+// In EquationParser constructor:
+functions["sigmoid"] = [](double x) { 
+    return 1.0 / (1.0 + exp(-x)); 
+};
+
+functions["relu"] = [](double x) { 
+    return max(0.0, x); 
+};
+```
+
+#### Variable Substitution
+
+```cpp
+// Allow user-defined variables
+parser.setVariable("a", 2.0);
+parser.setVariable("b", 3.0);
+// Now equation "a*x + b*y" evaluates with a=2, b=3
+```
+
+#### Symbolic Differentiation
+
+**Current**: Numerical derivatives
+
+**Advanced**: Parse equation into expression tree, apply differentiation rules
+
+```
+d/dx(x²) = 2x
+d/dx(sin(x)) = cos(x)
+d/dx(f+g) = f' + g'
+d/dx(f*g) = f'g + fg'
+```
+
+---
+
+## Code Organization Best Practices
+
+### Header Guards
+
+```cpp
+#ifndef SURFACE_H
+#define SURFACE_H
+// ... declarations ...
+#endif
+```
+
+**Why?** Prevents multiple inclusion in compilation units.
+
+### Const Correctness
+
+```cpp
+double evaluate(double x, double y) const;  // Doesn't modify object
+```
+
+**Benefits**:
+- Compiler optimization
+- Self-documenting code
+- Catch accidental modifications
+
+### RAII (Resource Acquisition Is Initialization)
+
+```cpp
+std::unique_ptr<Surface> surface;  // Automatic memory management
+```
+
+**No manual delete needed** - destructor automatically called.
+
+### Separation of Concerns
+
+Each class has a **single responsibility**:
+- `Surface`: Mathematical function representation
+- `Optimizer`: Finding minima
+- `Visualizer`: 3D rendering
+- `EquationParser`: String → function
+- `GUIManager`: User interface orchestration
+
+---
+
+## Troubleshooting
+
+### Common Build Errors
+
+#### "FreeGLUT not found"
+
+**Linux**: `sudo apt-get install freeglut3-dev`
+
+**Windows**: Download from freeglut.sourceforge.net, set `FREEGLUT_DIR`
+
+#### "GL/glut.h: No such file"
+
+Check include paths in CMakeLists.txt:
+```cmake
+include_directories(${FREEGLUT_DIR}/include)
+```
+
+### Runtime Errors
+
+#### "Singular Hessian"
+
+**Cause**: At saddle point or flat region
+
+**Solution**: Try different starting point or use gradient descent
+
+#### "Division by zero"
+
+**Cause**: Parsing `1/0` or surface that divides by zero
+
+**Solution**: Validate equation, check domain
+
+#### Surface not rendering
+
+**Possible causes**:
+- Domain doesn't contain surface (all z values are NaN/Inf)
+- Resolution too high for memory
+- OpenGL context not initialized
+
+---
+
+## Future Enhancements
+
+### Planned Features
+
+1. **More Optimization Algorithms**
+   - Adam optimizer
+   - L-BFGS
+   - Conjugate gradient
+
+2. **Better Visualization**
+   - Color mapping (heat map)
+   - Contour lines
+   - Multiple optimization paths
+
+3. **Advanced Parser**
+   - Symbolic differentiation
+   - Expression simplification
+   - Multi-line equations
+
+4. **User Interface**
+   - Modern GUI (Qt/ImGui)
+   - Real-time equation editing
+   - Parameter sliders
+
+5. **Export Capabilities**
+   - Save surfaces as OBJ files
+   - Export optimization data to CSV
+   - Screenshot functionality
+
+### Contributing
+
+This project follows standard C++ coding conventions:
+- CamelCase for classes
+- camelCase for methods
+- UPPER_CASE for constants
+- Meaningful variable names
+- Comments for complex algorithms
+
+---
+
+## References & Further Reading
+
+### Books
+
+1. **"Numerical Optimization"** by Nocedal & Wright
+   - Comprehensive optimization theory
+   - Convergence proofs
+   - Advanced algorithms
+
+2. **"Computer Graphics: Principles and Practice"** by Foley et al.
+   - OpenGL fundamentals
+   - Lighting models
+   - Rendering techniques
+
+3. **"Compilers: Principles, Techniques, and Tools"** (Dragon Book)
+   - Parser theory
+   - Recursive descent parsing
+   - Abstract syntax trees
+
+### Online Resources
+
+- **OpenGL Tutorial**: learnopengl.com
+- **CMake Documentation**: cmake.org/documentation
+- **C++ Reference**: cppreference.com
+- **Optimization Algorithms**: Wikipedia articles on gradient descent, Newton's method
+
+### Mathematical Background
+
+- **Calculus**: Multivariable calculus, partial derivatives
+- **Linear Algebra**: Matrices, eigenvalues, positive definiteness
+- **Numerical Methods**: Finite differences, iterative methods
+
+---
+
+## License & Credits
+
+### Project Information
+
+- **Author**: Created as an educational project
+- **Purpose**: Demonstrating optimization algorithms and 3D visualization
+- **License**: Open source (specify license)
+
+### Technologies Used
+
+- **C++17**: Core language
+- **OpenGL**: 3D graphics API
+- **FreeGLUT**: Window management and input
+- **CMake**: Build system
+
+### Acknowledgments
+
+- FreeGLUT developers for the OpenGL toolkit
+- The C++ community for std::function and modern C++ features
+- Mathematical optimization community for algorithm research
+
+---
+
+## Appendix: Complete Mathematical Formulation
+
+### Problem Statement
+
+Given a continuous function `f: ℝ² → ℝ`, find:
+
+```
+x* = argmin f(x, y)
+     (x,y)∈D
+```
+
+Where D is the domain (rectangular region).
+
+### Gradient Descent Formulation
+
+**Initialize**: `x₀ = (x₀, y₀)`
+
+**Iterate**: For `t = 0, 1, 2, ...`
+```
+x(t+1) = x(t) - α∇f(x(t))
+```
+
+**Stop**: When `||∇f(x(t))|| < ε`
+
+**Convergence**: If f is L-smooth and α < 1/L:
+```
+f(x(k)) - f(x*) ≤ (L||x₀ - x*||²) / (2k)
+```
+
+### Newton's Method Formulation
+
+**Initialize**: `x₀ = (x₀, y₀)`
+
+**Iterate**: For `t = 0, 1, 2, ...`
+```
+x(t+1) = x(t) - [H(x(t))]⁻¹∇f(x(t))
+```
+
+Where:
+```
+H = [ ∂²f/∂x²    ∂²f/∂x∂y ]
+    [ ∂²f/∂x∂y   ∂²f/∂y²  ]
+```
+
+**Convergence**: If f is strongly convex and starting point close enough:
+```
+||x(k+1) - x*|| ≤ M||x(k) - x*||²
+```
+
+Quadratic convergence rate!
+
+---
+
+## Appendix: Code Statistics
+
+### Lines of Code
+
+```
+Point3D.h/cpp:         ~100 lines
+Surface.h/cpp:         ~200 lines
+Optimizer.h/cpp:       ~250 lines
+Visualizer.h/cpp:      ~350 lines
+EquationParser.h/cpp:  ~600 lines
+GUIManager.h/cpp:      ~800 lines
+main*.cpp:             ~100 lines
+Total:                 ~2400 lines
+```
+
+### Complexity Analysis
+
+**Surface Evaluation**: O(1) per point
+
+**Gradient Computation**: O(1) (4 function evaluations)
+
+**Hessian Computation**: O(1) (9 function evaluations)
+
+**Mesh Generation**: O(n²) for n×n grid
+
+**Optimization**: O(k·m) where k = iterations, m = cost per iteration
+
+**Parsing**: O(n) where n = equation length
+
+---
+
+This README provides a comprehensive technical overview of the 3D Surface Optimizer project. For specific questions or contributions, please refer to the individual source files and their inline documentation.
+
+**Happy Optimizing! 🎯**
