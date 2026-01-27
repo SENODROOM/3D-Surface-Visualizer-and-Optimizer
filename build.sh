@@ -32,7 +32,7 @@ echo -e "${GREEN}✓ CMake found${NC}"
 echo -e "${GREEN}✓ g++ found${NC}"
 
 # Check for OpenGL/GLUT
-if ! ldconfig -p | grep -q libglut; then
+if ! ldconfig -p | grep -q libglut 2>/dev/null; then
     echo -e "${YELLOW}WARNING: FreeGLUT not found!${NC}"
     echo "Install with: sudo apt-get install freeglut3-dev"
     read -p "Continue anyway? (y/n) " -n 1 -r
@@ -82,21 +82,50 @@ else
     exit 1
 fi
 
-# Check executables
+# Check executables (support both Windows and Linux paths)
 echo ""
 echo "Checking build artifacts..."
-if [ -f "release/optimizer" ]; then
+
+# Check for optimizer executable
+OPTIMIZER_FOUND=0
+if [ -f "Release/optimizer.exe" ]; then
+    echo -e "${GREEN}✓ optimizer.exe created (Windows)${NC}"
+    OPTIMIZER_FOUND=1
+    OPTIMIZER_PATH="Release/optimizer.exe"
+elif [ -f "optimizer.exe" ]; then
+    echo -e "${GREEN}✓ optimizer.exe created${NC}"
+    OPTIMIZER_FOUND=1
+    OPTIMIZER_PATH="optimizer.exe"
+elif [ -f "optimizer" ]; then
     echo -e "${GREEN}✓ optimizer executable created${NC}"
     chmod +x optimizer
-else
+    OPTIMIZER_FOUND=1
+    OPTIMIZER_PATH="optimizer"
+fi
+
+if [ $OPTIMIZER_FOUND -eq 0 ]; then
     echo -e "${RED}✗ optimizer executable not found!${NC}"
     exit 1
 fi
 
-if [ -f "optimizer_demo" ]; then
+# Check for optimizer_demo executable
+DEMO_FOUND=0
+if [ -f "Release/optimizer_demo.exe" ]; then
+    echo -e "${GREEN}✓ optimizer_demo.exe created (Windows)${NC}"
+    DEMO_FOUND=1
+    DEMO_PATH="Release/optimizer_demo.exe"
+elif [ -f "optimizer_demo.exe" ]; then
+    echo -e "${GREEN}✓ optimizer_demo.exe created${NC}"
+    DEMO_FOUND=1
+    DEMO_PATH="optimizer_demo.exe"
+elif [ -f "optimizer_demo" ]; then
     echo -e "${GREEN}✓ optimizer_demo executable created${NC}"
     chmod +x optimizer_demo
-else
+    DEMO_FOUND=1
+    DEMO_PATH="optimizer_demo"
+fi
+
+if [ $DEMO_FOUND -eq 0 ]; then
     echo -e "${YELLOW}⚠ optimizer_demo executable not found${NC}"
 fi
 
@@ -107,11 +136,19 @@ echo -e "${GREEN}  BUILD COMPLETE!${NC}"
 echo "========================================="
 echo ""
 echo "Created executables:"
-echo "  ./build/optimizer       - Main program with equation GUI"
-echo "  ./build/optimizer_demo  - Original demo version"
-echo ""
-echo "To run:"
-echo "  cd build && ./optimizer"
+if [ -f "Release/optimizer.exe" ]; then
+    echo "  ./build/Release/optimizer.exe       - Main program with equation GUI"
+    echo "  ./build/Release/optimizer_demo.exe  - Original demo version"
+    echo ""
+    echo "To run:"
+    echo "  cd build/Release && ./optimizer.exe"
+else
+    echo "  ./build/optimizer       - Main program with equation GUI"
+    echo "  ./build/optimizer_demo  - Original demo version"
+    echo ""
+    echo "To run:"
+    echo "  cd build && ./optimizer"
+fi
 echo ""
 echo "Controls in 3D view:"
 echo "  W/S - Rotate up/down"

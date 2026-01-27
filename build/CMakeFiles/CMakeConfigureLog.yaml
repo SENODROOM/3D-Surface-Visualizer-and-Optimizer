@@ -78,7 +78,7 @@ events:
       The output was:
       0
       MSBuild version 18.0.5+e22287bf1 for .NET Framework
-      Build started 1/27/2026 11:30:03 PM.
+      Build started 1/28/2026 12:03:59 AM.
       
       Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\4.2.0\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -107,7 +107,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:00.77
+      Time Elapsed 00:00:01.08
       
       
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -757,7 +757,7 @@ events:
       The output was:
       0
       MSBuild version 18.0.5+e22287bf1 for .NET Framework
-      Build started 1/27/2026 11:30:04 PM.
+      Build started 1/28/2026 12:04:01 AM.
       
       Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\4.2.0\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -786,7 +786,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:00.85
+      Time Elapsed 00:00:00.74
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -1186,8 +1186,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-0easxy"
-      binary: "C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-0easxy"
+      source: "C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-jap0p1"
+      binary: "C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-jap0p1"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_C_FLAGS_DEBUG: "/MDd /Zi /Ob0 /Od /RTC1"
@@ -1196,39 +1196,39 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-0easxy'
+        Change Dir: 'C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-jap0p1'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_98453.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_a7dd9.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.0.5+e22287bf1 for .NET Framework
-        Build started 1/27/2026 11:30:05 PM.
+        Build started 1/28/2026 12:04:02 AM.
         
-        Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0easxy\\cmTC_98453.vcxproj" on node 1 (default targets).
+        Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jap0p1\\cmTC_a7dd9.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0easxy\\Debug\\".
-          Creating directory "cmTC_98453.dir\\Debug\\cmTC_98453.tlog\\".
+          Creating directory "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jap0p1\\Debug\\".
+          Creating directory "cmTC_a7dd9.dir\\Debug\\cmTC_a7dd9.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_98453.dir\\Debug\\cmTC_98453.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_98453.dir\\Debug\\cmTC_98453.tlog\\unsuccessfulbuild".
+          Creating "cmTC_a7dd9.dir\\Debug\\cmTC_a7dd9.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_a7dd9.dir\\Debug\\cmTC_a7dd9.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_98453.dir\\Debug\\\\" /Fd"cmTC_98453.dir\\Debug\\vc145.pdb" /external:W3 /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCCompilerABI.c"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_a7dd9.dir\\Debug\\\\" /Fd"cmTC_a7dd9.dir\\Debug\\vc145.pdb" /external:W3 /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCCompilerABI.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35719 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_98453.dir\\Debug\\\\" /Fd"cmTC_98453.dir\\Debug\\vc145.pdb" /external:W3 /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCCompilerABI.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_a7dd9.dir\\Debug\\\\" /Fd"cmTC_a7dd9.dir\\Debug\\vc145.pdb" /external:W3 /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCCompilerABI.c"
           CMakeCCompilerABI.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0easxy\\Debug\\cmTC_98453.exe" /INCREMENTAL /ILK:"cmTC_98453.dir\\Debug\\cmTC_98453.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-0easxy/Debug/cmTC_98453.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-0easxy/Debug/cmTC_98453.lib" /MACHINE:X64  /machine:x64 cmTC_98453.dir\\Debug\\CMakeCCompilerABI.obj
-          cmTC_98453.vcxproj -> C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0easxy\\Debug\\cmTC_98453.exe
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jap0p1\\Debug\\cmTC_a7dd9.exe" /INCREMENTAL /ILK:"cmTC_a7dd9.dir\\Debug\\cmTC_a7dd9.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-jap0p1/Debug/cmTC_a7dd9.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-jap0p1/Debug/cmTC_a7dd9.lib" /MACHINE:X64  /machine:x64 cmTC_a7dd9.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_a7dd9.vcxproj -> C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jap0p1\\Debug\\cmTC_a7dd9.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_98453.dir\\Debug\\cmTC_98453.tlog\\unsuccessfulbuild".
-          Touching "cmTC_98453.dir\\Debug\\cmTC_98453.tlog\\cmTC_98453.lastbuildstate".
-        Done Building Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0easxy\\cmTC_98453.vcxproj" (default targets).
+          Deleting file "cmTC_a7dd9.dir\\Debug\\cmTC_a7dd9.tlog\\unsuccessfulbuild".
+          Touching "cmTC_a7dd9.dir\\Debug\\cmTC_a7dd9.tlog\\cmTC_a7dd9.lastbuildstate".
+        Done Building Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jap0p1\\cmTC_a7dd9.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.78
+        Time Elapsed 00:00:00.71
         
       exitCode: 0
   -
@@ -1268,8 +1268,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-3r0hok"
-      binary: "C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-3r0hok"
+      source: "C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-bl4mu2"
+      binary: "C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-bl4mu2"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /W3 /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/MDd /Zi /Ob0 /Od /RTC1"
@@ -1279,39 +1279,39 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-3r0hok'
+        Change Dir: 'C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-bl4mu2'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_47976.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_baa88.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.0.5+e22287bf1 for .NET Framework
-        Build started 1/27/2026 11:30:06 PM.
+        Build started 1/28/2026 12:04:03 AM.
         
-        Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-3r0hok\\cmTC_47976.vcxproj" on node 1 (default targets).
+        Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-bl4mu2\\cmTC_baa88.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-3r0hok\\Debug\\".
-          Creating directory "cmTC_47976.dir\\Debug\\cmTC_47976.tlog\\".
+          Creating directory "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-bl4mu2\\Debug\\".
+          Creating directory "cmTC_baa88.dir\\Debug\\cmTC_baa88.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_47976.dir\\Debug\\cmTC_47976.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_47976.dir\\Debug\\cmTC_47976.tlog\\unsuccessfulbuild".
+          Creating "cmTC_baa88.dir\\Debug\\cmTC_baa88.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_baa88.dir\\Debug\\cmTC_baa88.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /Fo"cmTC_47976.dir\\Debug\\\\" /Fd"cmTC_47976.dir\\Debug\\vc145.pdb" /external:W3 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /Fo"cmTC_baa88.dir\\Debug\\\\" /Fd"cmTC_baa88.dir\\Debug\\vc145.pdb" /external:W3 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35719 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /Fo"cmTC_47976.dir\\Debug\\\\" /Fd"cmTC_47976.dir\\Debug\\vc145.pdb" /external:W3 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /Fo"cmTC_baa88.dir\\Debug\\\\" /Fd"cmTC_baa88.dir\\Debug\\vc145.pdb" /external:W3 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-3r0hok\\Debug\\cmTC_47976.exe" /INCREMENTAL /ILK:"cmTC_47976.dir\\Debug\\cmTC_47976.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-3r0hok/Debug/cmTC_47976.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-3r0hok/Debug/cmTC_47976.lib" /MACHINE:X64  /machine:x64 cmTC_47976.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_47976.vcxproj -> C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-3r0hok\\Debug\\cmTC_47976.exe
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-bl4mu2\\Debug\\cmTC_baa88.exe" /INCREMENTAL /ILK:"cmTC_baa88.dir\\Debug\\cmTC_baa88.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-bl4mu2/Debug/cmTC_baa88.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Programming/3D Surface Visualizer and Optimizer/build/CMakeFiles/CMakeScratch/TryCompile-bl4mu2/Debug/cmTC_baa88.lib" /MACHINE:X64  /machine:x64 cmTC_baa88.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_baa88.vcxproj -> C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-bl4mu2\\Debug\\cmTC_baa88.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_47976.dir\\Debug\\cmTC_47976.tlog\\unsuccessfulbuild".
-          Touching "cmTC_47976.dir\\Debug\\cmTC_47976.tlog\\cmTC_47976.lastbuildstate".
-        Done Building Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-3r0hok\\cmTC_47976.vcxproj" (default targets).
+          Deleting file "cmTC_baa88.dir\\Debug\\cmTC_baa88.tlog\\unsuccessfulbuild".
+          Touching "cmTC_baa88.dir\\Debug\\cmTC_baa88.tlog\\cmTC_baa88.lastbuildstate".
+        Done Building Project "C:\\Programming\\3D Surface Visualizer and Optimizer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-bl4mu2\\cmTC_baa88.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.72
+        Time Elapsed 00:00:00.77
         
       exitCode: 0
   -
