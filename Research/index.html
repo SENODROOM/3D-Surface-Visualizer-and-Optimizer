@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <title>3D Surface Visualizer - Complete Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>3D Surface Visualizer</h1>
+            <p class="subtitle">Complete Technical Documentation & Deep Code Analysis</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <div class="nav-content">
+                <a href="#overview" class="nav-link">Overview</a>
+                <a href="#equation-parser" class="nav-link">Equation Parser</a>
+                <a href="#implementation" class="nav-link">Implementation</a>
+                <a href="#parsing-deep-dive" class="nav-link">Parsing Algorithm</a>
+                <a href="#gui-manager" class="nav-link">GUI Manager</a>
+                <a href="#architecture" class="nav-link">Architecture</a>
+                <a href="#concepts" class="nav-link">Core Concepts</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section id="overview">
+            <h2>🎯 System Overview</h2>
+            <p>This C++ application is a comprehensive tool for visualizing and optimizing 3D mathematical surfaces. It
+                combines lexical analysis, recursive descent parsing, numerical optimization, and real-time 3D graphics
+                into an integrated framework.</p>
+
+            <div class="highlight-box">
+                <h3>Architecture at a Glance</h3>
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <div class="concept-title">🧮 EquationParser</div>
+                        <p>Sophisticated mathematical expression evaluator supporting variables, operators, and
+                            functions. Uses tokenization and recursive descent parsing.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-title">🖥️ GUIManager</div>
+                        <p>State-machine-based interactive interface for equation input, parameter configuration, and
+                            user interaction via GLUT.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-title">⚡ Optimizer</div>
+                        <p>Gradient descent implementation using numerical differentiation to find local minima with
+                            convergence detection and path recording.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-title">📊 Visualizer</div>
+                        <p>OpenGL-based 3D renderer with mesh generation, color mapping, camera controls, and
+                            optimization path display.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>Complete Workflow</h3>
+                <div class="flow-diagram">
+                    <div class="flow-box">Input Equation</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Tokenize</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Parse</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Configure</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Optimize</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Visualize</div>
+                </div>
+            </div>
+
+            <h3>File Structure</h3>
+            <table class="variable-table">
+                <tr>
+                    <th>File</th>
+                    <th>Purpose</th>
+                    <th>Lines</th>
+                </tr>
+                <tr>
+                    <td>EquationParser.h</td>
+                    <td>Class interface & token definitions</td>
+                    <td>~100</td>
+                </tr>
+                <tr>
+                    <td>EquationParser.cpp</td>
+                    <td>Parser implementation & evaluation</td>
+                    <td>~500</td>
+                </tr>
+                <tr>
+                    <td>GUIManager.h</td>
+                    <td>Interactive interface declarations</td>
+                    <td>~120</td>
+                </tr>
+                <tr>
+                    <td>GUIManager.cpp</td>
+                    <td>State machine & rendering logic</td>
+                    <td>~600</td>
+                </tr>
+                <tr>
+                    <td>main.cpp</td>
+                    <td>Hardcoded demo with paraboloid</td>
+                    <td>~80</td>
+                </tr>
+                <tr>
+                    <td>main_equation_gui.cpp</td>
+                    <td>Interactive GUI entry point</td>
+                    <td>~30</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="equation-parser">
+            <h2>📄 EquationParser.h - Header Analysis</h2>
+
+            <h3>Token Type Enumeration</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">Token System Design</span></div>
+                <pre><code><span class="keyword">enum</span> <span class="type">TokenType</span> {
+    <span class="type">NUMBER</span>,      <span class="comment">// Numeric constants (42, 3.14, 2.5e-3)</span>
+    <span class="type">VARIABLE</span>,    <span class="comment">// Variable identifiers (x, y, theta)</span>
+    <span class="type">OPERATOR</span>,    <span class="comment">// Binary/unary operators (+, -, *, /, ^, %)</span>
+    <span class="type">FUNCTION</span>,    <span class="comment">// Mathematical functions (sin, cos, sqrt, log)</span>
+    <span class="type">LPAREN</span>,      <span class="comment">// Left parenthesis for grouping</span>
+    <span class="type">RPAREN</span>,      <span class="comment">// Right parenthesis</span>
+    <span class="type">END</span>          <span class="comment">// Marks end of token stream</span>
+};
+
+<span class="keyword">struct</span> <span class="type">Token</span> {
+    <span class="type">TokenType</span> type;     <span class="comment">// Classification of this token</span>
+    std::string value;    <span class="comment">// String representation</span>
+    <span class="keyword">double</span> numValue;      <span class="comment">// Numeric value (for NUMBER tokens)</span>
+};</code></pre>
+            </div>
+
+            <div class="success-card">
+                <h4>Design Rationale</h4>
+                <p>The token system separates lexical analysis (tokenization) from syntactic analysis (parsing):</p>
+                <ul>
+                    <li><strong>Type Safety:</strong> Enum provides compile-time guarantees</li>
+                    <li><strong>Efficiency:</strong> Pre-parsed numbers avoid repeated string-to-double conversion</li>
+                    <li><strong>Flexibility:</strong> Value field supports both symbols and multi-char identifiers</li>
+                    <li><strong>Clarity:</strong> Each token carries all information needed for parsing</li>
+                </ul>
+            </div>
+
+            <h3>Class Member Variables</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">Private Data Members</span></div>
+                <pre><code><span class="keyword">private</span>:
+    std::string equation;                              <span class="comment">// Normalized equation string</span>
+    std::map&lt;std::string, <span class="keyword">double</span>&gt; variables;           <span class="comment">// Variable bindings (x→1.5, y→2.0)</span>
+    
+    std::vector&lt;<span class="type">Token</span>&gt; tokens;                        <span class="comment">// Tokenized expression array</span>
+    <span class="keyword">size_t</span> currentToken;                             <span class="comment">// Parser position in token stream</span>
+    
+    <span class="comment">// Function maps: name → lambda implementation</span>
+    std::map&lt;std::string, std::function&lt;<span class="keyword">double</span>(<span class="keyword">double</span>)&gt;&gt; functions;
+    std::map&lt;std::string, std::function&lt;<span class="keyword">double</span>(<span class="keyword">double</span>, <span class="keyword">double</span>)&gt;&gt; binaryFunctions;</code></pre>
+            </div>
+
+            <div class="info-card">
+                <h4>Key Design Decisions</h4>
+                <table class="variable-table">
+                    <tr>
+                        <th>Component</th>
+                        <th>Choice</th>
+                        <th>Justification</th>
+                    </tr>
+                    <tr>
+                        <td>Function Storage</td>
+                        <td>std::function + std::map</td>
+                        <td>Allows runtime registration, lambda support, type safety</td>
+                    </tr>
+                    <tr>
+                        <td>Variable Storage</td>
+                        <td>std::map&lt;string, double&gt;</td>
+                        <td>O(log n) lookup, supports dynamic variable sets</td>
+                    </tr>
+                    <tr>
+                        <td>Token Array</td>
+                        <td>std::vector&lt;Token&gt;</td>
+                        <td>Random access for parsing, efficient memory usage</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3>Parsing Method Hierarchy</h3>
+            <div class="highlight-box">
+                <p>Recursive descent parser with precedence-climbing:</p>
+                <ul>
+                    <li><span class="inline-code">tokenize()</span> - Lexical analysis phase</li>
+                    <li><span class="inline-code">parseExpression()</span> - Lowest precedence: + - (left-associative)
+                    </li>
+                    <li><span class="inline-code">parseTerm()</span> - Medium precedence: * / % (left-associative)</li>
+                    <li><span class="inline-code">parsePower()</span> - High precedence: ^ (right-associative)</li>
+                    <li><span class="inline-code">parseUnary()</span> - Unary operators: +x -x</li>
+                    <li><span class="inline-code">parsePrimary()</span> - Highest precedence: literals, variables,
+                        functions, parentheses</li>
+                </ul>
+            </div>
+
+            <h3>Public API</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">User-Facing Interface</span></div>
+                <pre><code><span class="keyword">public</span>:
+    <span class="comment">// Constructors</span>
+    <span class="function">EquationParser</span>();
+    <span class="function">EquationParser</span>(<span class="keyword">const</span> std::string &amp;eq);
+    
+    <span class="comment">// Configuration</span>
+    <span class="keyword">void</span> <span class="function">setEquation</span>(<span class="keyword">const</span> std::string &amp;eq);
+    <span class="keyword">void</span> <span class="function">setVariable</span>(<span class="keyword">const</span> std::string &amp;name, <span class="keyword">double</span> value);
+    
+    <span class="comment">// Evaluation (multiple overloads for convenience)</span>
+    <span class="keyword">double</span> <span class="function">evaluate</span>();                                      <span class="comment">// Use stored variables</span>
+    <span class="keyword">double</span> <span class="function">evaluate</span>(<span class="keyword">const</span> std::map&lt;std::string, <span class="keyword">double</span>&gt; &amp;vars); <span class="comment">// One-shot with map</span>
+    <span class="keyword">double</span> <span class="function">evaluate</span>(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> z = <span class="number">0</span>);        <span class="comment">// Quick 3D eval</span>
+    
+    <span class="comment">// Utilities</span>
+    <span class="keyword">bool</span> <span class="function">validate</span>(std::string &amp;errorMessage);              <span class="comment">// Syntax check</span>
+    std::vector&lt;std::string&gt; <span class="function">getVariables</span>() <span class="keyword">const</span>;        <span class="comment">// Extract var names</span>
+    <span class="keyword">static</span> std::string <span class="function">normalizeEquation</span>(<span class="keyword">const</span> std::string &amp;eq);  <span class="comment">// Pre-process</span></code></pre>
+            </div>
+        </section>
+
+        <section id="implementation">
+            <h2>⚙️ EquationParser.cpp - Implementation Deep Dive</h2>
+
+            <h3>Constructor - Function Registration</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">Lambda-Based Function Library</span></div>
+                <pre><code><span class="function">EquationParser::EquationParser</span>() {
+    <span class="comment">// Unary functions: single parameter</span>
+    functions[<span class="string">"sin"</span>]   = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::sin(x); };
+    functions[<span class="string">"cos"</span>]   = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::cos(x); };
+    functions[<span class="string">"tan"</span>]   = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::tan(x); };
+    functions[<span class="string">"exp"</span>]   = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::exp(x); };       <span class="comment">// e^x</span>
+    functions[<span class="string">"log"</span>]   = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::log(x); };       <span class="comment">// ln(x)</span>
+    functions[<span class="string">"log10"</span>] = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::log10(x); };    <span class="comment">// log_10(x)</span>
+    functions[<span class="string">"sqrt"</span>]  = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::sqrt(x); };
+    functions[<span class="string">"abs"</span>]   = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::abs(x); };
+    functions[<span class="string">"floor"</span>] = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::floor(x); };
+    functions[<span class="string">"ceil"</span>]  = [](<span class="keyword">double</span> x) { <span class="keyword">return</span> std::ceil(x); };
+    
+    <span class="comment">// Binary functions: two parameters</span>
+    binaryFunctions[<span class="string">"pow"</span>] = [](<span class="keyword">double</span> x, <span class="keyword">double</span> y) { <span class="keyword">return</span> std::pow(x, y); };
+    binaryFunctions[<span class="string">"min"</span>] = [](<span class="keyword">double</span> x, <span class="keyword">double</span> y) { <span class="keyword">return</span> std::min(x, y); };
+    binaryFunctions[<span class="string">"max"</span>] = [](<span class="keyword">double</span> x, <span class="keyword">double</span> y) { <span class="keyword">return</span> std::max(x, y); };
+}</code></pre>
+            </div>
+
+            <div class="success-card">
+                <h4>Complete Function Library</h4>
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <div class="concept-title">Trigonometric</div>
+                        <p>sin, cos, tan</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-title">Exponential/Log</div>
+                        <p>exp, log (ln), log10</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-title">Arithmetic</div>
+                        <p>sqrt, abs, pow(x,y)</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-title">Rounding</div>
+                        <p>floor, ceil</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-title">Comparison</div>
+                        <p>min(x,y), max(x,y)</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Equation Normalization</h3>
+            <p>Critical preprocessing step that transforms user-friendly input into parseable format:</p>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">Step 1: Basic Cleanup</span></div>
+                <pre><code>std::string <span class="function">normalizeEquation</span>(<span class="keyword">const</span> std::string &amp;eq) {
+    std::string normalized = eq;
+    
+    <span class="comment">// Remove all whitespace for easier parsing</span>
+    normalized.erase(
+        std::remove(normalized.begin(), normalized.end(), <span class="string">' '</span>),
+        normalized.end()
+    );
+    
+    <span class="comment">// Convert Python-style ** to standard ^ exponentiation</span>
+    <span class="keyword">size_t</span> pos = <span class="number">0</span>;
+    <span class="keyword">while</span> ((pos = normalized.find(<span class="string">"**"</span>, pos)) != std::string::npos) {
+        normalized.replace(pos, <span class="number">2</span>, <span class="string">"^"</span>);
+    }
+}</code></pre>
+            </div>
+
+            <h3>Implicit Multiplication Insertion</h3>
+            <p>The most sophisticated normalization feature - automatically adds * operators:</p>
+
+            <div class="warning-card">
+                <h4>Implicit Multiplication Rules</h4>
+                <table class="variable-table">
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Example</th>
+                        <th>Normalized</th>
+                        <th>Rule</th>
+                    </tr>
+                    <tr>
+                        <td>Number + Letter</td>
+                        <td>2x</td>
+                        <td>2*x</td>
+                        <td>Coefficient notation</td>
+                    </tr>
+                    <tr>
+                        <td>Number + Paren</td>
+                        <td>3(x+1)</td>
+                        <td>3*(x+1)</td>
+                        <td>Distribute notation</td>
+                    </tr>
+                    <tr>
+                        <td>Paren + Number</td>
+                        <td>(x)2</td>
+                        <td>(x)*2</td>
+                        <td>Grouping first</td>
+                    </tr>
+                    <tr>
+                        <td>Paren + Letter</td>
+                        <td>(a+b)c</td>
+                        <td>(a+b)*c</td>
+                        <td>Algebraic notation</td>
+                    </tr>
+                    <tr>
+                        <td>Paren + Paren</td>
+                        <td>(x)(y)</td>
+                        <td>(x)*(y)</td>
+                        <td>Factor notation</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">Function vs Variable Detection</span></div>
+                <pre><code><span class="keyword">else if</span> (std::isalpha(current) && next == <span class="string">'('</span>) {
+    <span class="comment">// Critical decision: is this a function call or variable multiplication?</span>
+    <span class="comment">// sin(x) → no multiplication (it's a function)</span>
+    <span class="comment">// f(x) → f*(x) (it's a variable)</span>
+    
+    std::string funcName;
+    <span class="keyword">int</span> j = i;
+    
+    <span class="comment">// Walk backwards to find start of identifier</span>
+    <span class="keyword">while</span> (j &gt;= <span class="number">0</span> && std::isalpha(normalized[j]))
+        j--;
+    j++;
+    
+    <span class="comment">// Extract complete function name</span>
+    <span class="keyword">for</span> (<span class="keyword">int</span> k = j; k &lt;= (<span class="keyword">int</span>)i; k++)
+        funcName += normalized[k];
+    
+    <span class="comment">// Check against known function registry</span>
+    <span class="keyword">if</span> (!isKnownFunctionName(funcName))
+        needsMult = <span class="keyword">true</span>;  <span class="comment">// It's a variable!</span>
+}</code></pre>
+            </div>
+
+            <h3>Tokenization with Scientific Notation</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">Number Recognition Algorithm</span></div>
+                <pre><code><span class="keyword">if</span> (std::isdigit(c) || c == <span class="string">'.'</span>) {
+    std::string numStr;
+    
+    <span class="comment">// Complex state machine for number formats:</span>
+    <span class="comment">// - Integers: 42</span>
+    <span class="comment">// - Decimals: 3.14159</span>
+    <span class="comment">// - Scientific: 2.5e-3, 6.022e23</span>
+    
+    <span class="keyword">while</span> (i &lt; equation.length() &&
+           (std::isdigit(equation[i]) ||
+            equation[i] == <span class="string">'.'</span> ||
+            equation[i] == <span class="string">'e'</span> || equation[i] == <span class="string">'E'</span> ||
+            <span class="comment">// Allow minus sign only after 'e' or 'E'</span>
+            (equation[i] == <span class="string">'-'</span> && i &gt; <span class="number">0</span> && 
+             (equation[i<span class="number">-1</span>] == <span class="string">'e'</span> || equation[i<span class="number">-1</span>] == <span class="string">'E'</span>))))
+    {
+        numStr += equation[i++];
+    }
+    
+    <span class="type">Token</span> token;
+    token.type = NUMBER;
+    token.value = numStr;
+    token.numValue = std::stod(numStr);  <span class="comment">// Parse to double</span>
+    tokens.push_back(token);
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="parsing-deep-dive">
+            <h2>🧠 Parsing Algorithm - Complete Execution Trace</h2>
+            <p>Let's trace <span class="inline-code">2*x + sin(y^3)</span> with x=1, y=2:</p>
+
+            <h3>Tokenization Result</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">Token Stream</span></div>
+                <pre><code>[<span class="number">0</span>] NUMBER    <span class="string">"2"</span>     numValue=<span class="number">2.0</span>
+[<span class="number">1</span>] OPERATOR  <span class="string">"*"</span>
+[<span class="number">2</span>] VARIABLE  <span class="string">"x"</span>
+[<span class="number">3</span>] OPERATOR  <span class="string">"+"</span>
+[<span class="number">4</span>] FUNCTION  <span class="string">"sin"</span>
+[<span class="number">5</span>] LPAREN    <span class="string">"("</span>
+[<span class="number">6</span>] VARIABLE  <span class="string">"y"</span>
+[<span class="number">7</span>] OPERATOR  <span class="string">"^"</span>
+[<span class="number">8</span>] NUMBER    <span class="string">"3"</span>     numValue=<span class="number">3.0</span>
+[<span class="number">9</span>] RPAREN    <span class="string">")"</span>
+[<span class="number">10</span>] END</code></pre>
+            </div>
+
+            <h3>Complete Call Stack Trace</h3>
+            <div class="info-card">
+                <pre
+                    style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; background: var(--code-bg); padding: 1.5rem; border-radius: 6px; overflow-x: auto; line-height: 1.5;"><code><span class="type">LEVEL 1:</span> evaluate()
+  └─ tokenize() → generates token array
+  └─ currentToken = <span class="number">0</span>
+  └─ parseExpression()
+
+<span class="type">LEVEL 2:</span> parseExpression()  <span class="comment">// Handles +</span>
+  └─ parseTerm()  <span class="comment">// Left operand</span>
+
+<span class="type">LEVEL 3:</span> parseTerm()  <span class="comment">// Handles *</span>
+  └─ parsePower()
+
+<span class="type">LEVEL 4:</span> parsePower()
+  └─ parseUnary()
+
+<span class="type">LEVEL 5:</span> parseUnary()
+  └─ parsePrimary()
+
+<span class="type">LEVEL 6:</span> parsePrimary()
+  → Token[<span class="number">0</span>] is NUMBER
+  → currentToken = <span class="number">1</span>
+  → RETURNS <span class="number">2.0</span>
+
+<span class="comment">// Stack unwinds back to parseTerm()</span>
+
+<span class="type">LEVEL 3:</span> parseTerm() continued
+  → result = <span class="number">2.0</span>
+  → Token[<span class="number">1</span>] is OPERATOR "*"
+  → currentToken = <span class="number">2</span>
+  → Call parsePower() for right operand
+
+<span class="type">LEVEL 4-6:</span> parsePower() → parseUnary() → parsePrimary()
+  → Token[<span class="number">2</span>] is VARIABLE "x"
+  → Lookup: variables["x"] = <span class="number">1.0</span>
+  → currentToken = <span class="number">3</span>
+  → RETURNS <span class="number">1.0</span>
+
+<span class="type">LEVEL 3:</span> parseTerm() finishes
+  → right = <span class="number">1.0</span>
+  → result = <span class="number">2.0</span> * <span class="number">1.0</span> = <span class="number">2.0</span>
+  → Token[<span class="number">3</span>] is "+" (not *, /, %)
+  → Exit loop, RETURNS <span class="number">2.0</span>
+
+<span class="type">LEVEL 2:</span> parseExpression() continued
+  → result = <span class="number">2.0</span>
+  → Token[<span class="number">3</span>] is OPERATOR "+"
+  → currentToken = <span class="number">4</span>
+  → Call parseTerm() for right operand
+
+<span class="type">LEVEL 3-6:</span> parseTerm() → ... → parsePrimary()
+  → Token[<span class="number">4</span>] is FUNCTION "sin"
+  → currentToken = <span class="number">5</span>
+  → Token[<span class="number">5</span>] must be LPAREN ✓
+  → currentToken = <span class="number">6</span>
+  → Call parseExpression() for argument
+
+<span class="type">LEVEL 7:</span> parseExpression() <span class="comment">// For sin's argument</span>
+  → parseTerm() → parsePower()
+
+<span class="type">LEVEL 8:</span> parsePower()
+  → parseUnary() → parsePrimary()
+  → Token[<span class="number">6</span>] is VARIABLE "y"
+  → variables["y"] = <span class="number">2.0</span>
+  → currentToken = <span class="number">7</span>
+  → result = <span class="number">2.0</span>
+  → Token[<span class="number">7</span>] is OPERATOR "^"
+  → currentToken = <span class="number">8</span>
+  → Call parsePower() recursively  <span class="comment">// RIGHT ASSOCIATIVE!</span>
+
+<span class="type">LEVEL 9:</span> parsePower() <span class="comment">// For exponent</span>
+  → parseUnary() → parsePrimary()
+  → Token[<span class="number">8</span>] is NUMBER <span class="number">3.0</span>
+  → currentToken = <span class="number">9</span>
+  → RETURNS <span class="number">3.0</span>
+
+<span class="type">LEVEL 8:</span> parsePower() continued
+  → exponent = <span class="number">3.0</span>
+  → result = pow(<span class="number">2.0</span>, <span class="number">3.0</span>) = <span class="number">8.0</span>
+  → RETURNS <span class="number">8.0</span>
+
+<span class="type">LEVEL 7:</span> parseExpression() gets <span class="number">8.0</span>
+  → Token[<span class="number">9</span>] is RPAREN (end of argument)
+  → RETURNS <span class="number">8.0</span>
+
+<span class="type">LEVEL 6:</span> parsePrimary() continued
+  → arg = <span class="number">8.0</span>
+  → Token[<span class="number">9</span>] is RPAREN ✓
+  → currentToken = <span class="number">10</span>
+  → Execute: functions["sin"](<span class="number">8.0</span>)
+  → sin(<span class="number">8.0</span>) ≈ <span class="number">0.989358</span>
+  → RETURNS <span class="number">0.989358</span>
+
+<span class="type">LEVEL 2:</span> parseExpression() final step
+  → right = <span class="number">0.989358</span>
+  → result = <span class="number">2.0</span> + <span class="number">0.989358</span> = <span class="number">2.989358</span>
+  → Token[<span class="number">10</span>] is END
+  → RETURNS <span class="number">2.989358</span>
+
+<span class="function">═══════════════════════════════════</span>
+<span class="function">FINAL RESULT:</span> <span class="number">2.989358</span>
+<span class="function">═══════════════════════════════════</span></code></pre>
+            </div>
+
+            <h3>Precedence Table</h3>
+            <table class="variable-table">
+                <tr>
+                    <th>Level</th>
+                    <th>Operators</th>
+                    <th>Associativity</th>
+                    <th>Parser Method</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td>1 (Highest)</td>
+                    <td>( ) literals functions</td>
+                    <td>N/A</td>
+                    <td>parsePrimary()</td>
+                    <td>42, x, sin(x), (x+1)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>unary + -</td>
+                    <td>Right</td>
+                    <td>parseUnary()</td>
+                    <td>-x, +5, --x</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>^</td>
+                    <td>Right</td>
+                    <td>parsePower()</td>
+                    <td>2^3^2 = 2^(3^2) = 512</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>* / %</td>
+                    <td>Left</td>
+                    <td>parseTerm()</td>
+                    <td>8/2/2 = (8/2)/2 = 2</td>
+                </tr>
+                <tr>
+                    <td>5 (Lowest)</td>
+                    <td>+ -</td>
+                    <td>Left</td>
+                    <td>parseExpression()</td>
+                    <td>5-3+1 = (5-3)+1 = 3</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="gui-manager">
+            <h2>🖥️ GUIManager - Interactive Interface</h2>
+
+            <h3>State Machine</h3>
+            <div class="code-block">
+                <div class="code-header"><span class="code-filename">GUI States</span></div>
+                <pre><code><span class="keyword">enum</span> <span class="type">GUIState</span> {
+    <span class="type">EQUATION_INPUT</span>,   <span class="comment">// User typing equation</span>
+    <span class="type">CONFIGURATION</span>,    <span class="comment">// Parameter setup</span>
+    <span class="type">VISUALIZING</span>,      <span class="comment">// 3D visualization active</span>
+    <span class="type">ERROR_DISPLAY</span>     <span class="comment">// Error message shown</span>
+};</code></pre>
+            </div>
+
+            <div class="flow-diagram">
+                <div class="flow-box">EQUATION_INPUT</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">CONFIGURATION</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">VISUALIZING</div>
+            </div>
+
+            <h3>Configuration Parameters</h3>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <div class="concept-title">Optimize (y/n)</div>
+                    <p>Toggle gradient descent optimization</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">Start Point (x,y)</div>
+                    <p>Initial coordinates for optimizer</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">Learning Rate α</div>
+                    <p>Step size for gradient descent</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">View Bounds</div>
+                    <p>X/Y min/max ranges</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">Resolution</div>
+                    <p>Mesh grid density</p>
+                </div>
+            </div>
+
+            <div class="warning-card">
+                <h4>Singleton Pattern for GLUT</h4>
+                <p>GLUT requires static callback functions. Solution: Singleton pattern</p>
+                <pre
+                    style="background: var(--code-bg); padding: 1rem; border-radius: 6px; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;"><code><span class="keyword">static</span> GUIManager *instance;  <span class="comment">// Global pointer</span>
+
+<span class="keyword">static void</span> <span class="function">displayCallback</span>() {
+    instance-&gt;display();  <span class="comment">// Route to instance method</span>
+}
+
+<span class="keyword">void</span> <span class="function">initialize</span>(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv) {
+    instance = <span class="keyword">this</span>;
+    glutDisplayFunc(displayCallback);
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <h2>🏗️ System Architecture</h2>
+
+            <h3>Component Diagram</h3>
+            <div class="highlight-box">
+                <pre style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; line-height: 1.3;"><code>┌────────────────────────────────────────────────────┐
+│                  User Programs                     │
+│  ┌──────────────┐           ┌──────────────────┐  │
+│  │  main.cpp    │           │ main_equation    │  │
+│  │  (Demo)      │           │ _gui.cpp (GUI)   │  │
+│  └──────┬───────┘           └────────┬─────────┘  │
+└─────────┼──────────────────────────────┼──────────┘
+          │                              ▼
+          │                    ┌──────────────────┐
+          │                    │   GUIManager     │
+          │                    │  (State Machine) │
+          │                    └────────┬─────────┘
+          ▼                             │
+┌─────────────────────────────────────────────────────┐
+│                 Core Engine                         │
+│                                                     │
+│  ┌───────────────────┐      ┌──────────────────┐  │
+│  │ EquationParser    │◄─────┤ CustomSurface    │  │
+│  │ ┌───────────────┐ │      │ (Adapter)        │  │
+│  │ │ Tokenizer     │ │      └────────┬─────────┘  │
+│  │ ├───────────────┤ │               │            │
+│  │ │ Recursive     │ │               │            │
+│  │ │ Descent       │ │               │            │
+│  │ │ Parser        │ │               │            │
+│  │ ├───────────────┤ │               │            │
+│  │ │ Function      │ │               │            │
+│  │ │ Library       │ │               │            │
+│  │ └───────────────┘ │               │            │
+│  └───────────────────┘               │            │
+│          ▲                            │            │
+│          │          ┌─────────────────┴──────┐    │
+│          │          │                        │    │
+│          │          ▼                        ▼    │
+│  ┌───────┴────────────────┐    ┌──────────────────┐
+│  │    Optimizer           │    │   Visualizer     │
+│  │  ┌──────────────────┐  │    │ ┌──────────────┐ │
+│  │  │ Gradient Descent │  │    │ │ OpenGL       │ │
+│  │  ├──────────────────┤  │    │ │ Rendering    │ │
+│  │  │ Convergence      │  │    │ ├──────────────┤ │
+│  │  │ Detection        │  │    │ │ Camera       │ │
+│  │  ├──────────────────┤  │───►│ │ Control      │ │
+│  │  │ Path Recording   │  │    │ ├──────────────┤ │
+│  │  └──────────────────┘  │    │ │ Path Display │ │
+│  └────────────────────────┘    │ └──────────────┘ │
+│                                └──────────────────┘│
+└─────────────────────────────────────────────────────┘</code></pre>
+            </div>
+
+            <h3>Design Patterns</h3>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <div class="concept-title">Strategy</div>
+                    <p>Optimizer interface allows swapping algorithms (GradientDescent, Newton, etc.)</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">Adapter</div>
+                    <p>CustomSurface adapts EquationParser to Surface interface</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">Singleton</div>
+                    <p>GUIManager instance for GLUT callbacks</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">State</div>
+                    <p>GUIManager state machine</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="concepts">
+            <h2>💡 Core Concepts</h2>
+
+            <h3>Recursive Descent Parsing</h3>
+            <div class="highlight-box">
+                <p><strong>Definition:</strong> Top-down parser where grammar rules map to functions, call stack mirrors
+                    parse tree.</p>
+                <h4>Advantages:</h4>
+                <ul>
+                    <li>Direct grammar-to-code translation</li>
+                    <li>Easy debugging (call stack = parse state)</li>
+                    <li>Extensible for new operators</li>
+                    <li>Clear error messages</li>
+                </ul>
+            </div>
+
+            <h3>Gradient Descent</h3>
+            <div class="success-card">
+                <p><strong>Algorithm:</strong> Iterative optimization moving opposite to gradient</p>
+                <div
+                    style="font-family: 'JetBrains Mono', monospace; background: var(--code-bg); padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                    <strong>Update Rule:</strong>
+                    x<sub>new</sub> = x<sub>old</sub> - α · ∇f(x<sub>old</sub>)
+
+                    <strong>Where:</strong>
+                    α = learning rate (step size)
+                    ∇f = gradient vector
+                </div>
+            </div>
+
+            <h3>Numerical Gradients</h3>
+            <div class="info-card">
+                <p><strong>Finite Difference:</strong></p>
+                <pre
+                    style="background: var(--code-bg); padding: 1rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; margin: 1rem 0;"><code>∂f/∂x ≈ [f(x+h, y) - f(x-h, y)] / (2h)
+∂f/∂y ≈ [f(x, y+h) - f(x, y-h)] / (2h)
+
+h = 1e-6 (small perturbation)</code></pre>
+                <p>Enables optimization without symbolic derivatives!</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>🎓 Summary</h2>
+            <div class="highlight-box">
+                <h3>Complete System Understanding</h3>
+                <p>You now understand:</p>
+                <ul>
+                    <li><strong>Lexical Analysis:</strong> Tokenization with scientific notation support</li>
+                    <li><strong>Syntax Analysis:</strong> Recursive descent with operator precedence</li>
+                    <li><strong>Semantic Analysis:</strong> Variable resolution and function dispatch</li>
+                    <li><strong>Numerical Methods:</strong> Finite differences for gradients</li>
+                    <li><strong>Optimization:</strong> Gradient descent with convergence detection</li>
+                    <li><strong>GUI Design:</strong> State machines and callback patterns</li>
+                    <li><strong>3D Graphics:</strong> OpenGL mesh generation and rendering</li>
+                </ul>
+            </div>
+
+            <div class="success-card">
+                <h3>Potential Enhancements</h3>
+                <ul>
+                    <li>Add Newton's method, L-BFGS optimizers</li>
+                    <li>Symbolic differentiation for exact gradients</li>
+                    <li>Implicit surfaces (f(x,y,z) = 0)</li>
+                    <li>Parametric equations</li>
+                    <li>Constraint handling</li>
+                    <li>Multi-threading for mesh generation</li>
+                    <li>Export to images/animations</li>
+                    <li>Mouse/touch camera controls</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p style="color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;">
+                3D Surface Visualizer - Deep Technical Documentation
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                const t = document.querySelector(a.getAttribute('href'));
+                if (t) t.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('section').forEach(s => {
+            s.style.opacity = '0';
+            s.style.transform = 'translateY(20px)';
+            s.style.transition = 'all 0.6s ease-out';
+            obs.observe(s);
+        });
+    </script>
+</body>
+
+</html>
